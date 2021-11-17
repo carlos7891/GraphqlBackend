@@ -1,33 +1,68 @@
-import  conectarBD from './db/db';
-import { UserModel } from './models/user';
-import { Enum_Rol, Enum_EstadoUsuario, Enum_TipoObjetivo } from './models/enums';
-import { ProjectModel } from './models/project';
+import express from "express";
+import cors from 'cors';
+import { ApolloServer } from 'apollo-server-express';
+import dotenv from 'dotenv';
+import conectarBD from "./db/db";
+import {typeDefs} from './graphql/types';
+import {resolvers} from './graphql/resolvers';
 
-const main = async () =>{
+dotenv.config();
+
+const server = new ApolloServer({
+    typeDefs:typeDefs,
+    resolvers: resolvers,
+});
+
+const app = express();
+
+app.use(express.json());
+
+app.use(cors());
+
+app.listen({port: process.env.PORT || 4000}, async ()=>{
     await conectarBD();
+    await server.start();
+    server.applyMiddleware({app});
 
-    await ProjectModel.create({
-        nombre: "Proyecto 1",
-        presupuesto: 120,
-        fechaInicio: Date.now(),
-        fechaFin: new Date("2022/11/10"),
-        lider: "618c4b5cefbb48ddb7e332dd",
-        objetivos:[
-            {descripcion: 'Objetivo general', tipo: Enum_TipoObjetivo.general},
-            {descripcion: 'Objetivo especifico 1', tipo: Enum_TipoObjetivo.especifico},
-            {descripcion: 'Objetivo especifico 2', tipo: Enum_TipoObjetivo.especifico},
-        ]
-    });
-
-    // const proyecto = await ProjectModel.find({ nombre: 'Proyecto 3'}).populate('lider');
-
-    // console.log('el proyecto es: ', proyecto)
+    console.log('servidor listo')
+});
 
 
-};
 
-main();
 
+
+
+
+
+
+
+
+
+
+// import  conectarBD from './db/db';
+// import { UserModel } from './models/user';
+// import { Enum_Rol, Enum_EstadoUsuario, Enum_TipoObjetivo } from './models/enums';
+// import { ProjectModel } from './models/project';
+
+// const main = async () =>{
+//     await conectarBD();
+
+//     await ProjectModel.create({
+//         nombre: "Proyecto 1",
+//         presupuesto: 120,
+//         fechaInicio: Date.now(),
+//         fechaFin: new Date("2022/11/10"),
+//         lider: "618c4b5cefbb48ddb7e332dd",
+//         objetivos:[
+//             {descripcion: 'Objetivo general', tipo: Enum_TipoObjetivo.general},
+//             {descripcion: 'Objetivo especifico 1', tipo: Enum_TipoObjetivo.especifico},
+//             {descripcion: 'Objetivo especifico 2', tipo: Enum_TipoObjetivo.especifico},
+//         ]
+//     });
+//     // const proyecto = await ProjectModel.find({ nombre: 'Proyecto 3'}).populate('lider');
+//     // console.log('el proyecto es: ', proyecto)
+// };
+// main();
     //Crud Usuarios!
 
     //Crear los Usuarios
